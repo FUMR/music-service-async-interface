@@ -33,8 +33,9 @@ class Session(ABC):
         # If none objects match url, then the url must be invalid
         raise InvalidURL
 
+    @staticmethod
     @abstractmethod
-    def is_valid_url(self, url) -> bool:
+    def is_valid_url(url) -> bool:
         """
         Performs basic check if string looks like music service URL
         """
