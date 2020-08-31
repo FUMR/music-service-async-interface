@@ -1,0 +1,12 @@
+[tool.poetry]
+name = "music-service-async-interface"
+version = "0.1.0"
+description = ""
+authors = ["JuniorJPDJ <dev@juniorjpdj.pl>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
