@@ -6,7 +6,7 @@ authors = ["JuniorJPDJ <dev@juniorjpdj.pl>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-http-seekable-file = {git = "https://github.com/JuniorJPDJ/http-seekable-file", extras = ["async"], optional = true}
+http-seekable-file = {git = "https://github.com/JuniorJPDJ/http-seekable-file.git", extras = ["async"], optional = true}
 aiohttp = "^3.6.2"
 
 [tool.poetry.extras]
