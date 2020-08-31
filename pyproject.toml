@@ -5,9 +5,9 @@ description = ""
 authors = ["JuniorJPDJ <dev@juniorjpdj.pl>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-http-seekable-file = {git = "https://github.com/JuniorJPDJ/http-seekable-file.git", extras = ["async"], optional = true}
-aiohttp = "^3.6.2"
+python = "^3.7"
+http-seekable-file = { git = "https://github.com/JuniorJPDJ/http-seekable-file.git", extras = ["async"], optional = true }
+aiohttp = "^3.6"
 
 [tool.poetry.extras]
 filelike = ["http-seekable-file"]
