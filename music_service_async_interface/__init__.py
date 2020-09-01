@@ -88,6 +88,8 @@ class Cover(ABC):
 
 
 class Track(Object, ABC):
+    # TODO: Consider adding audio_quality property to Track
+
     @property
     @abstractmethod
     def title(self) -> str:
