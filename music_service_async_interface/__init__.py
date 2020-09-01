@@ -73,12 +73,12 @@ class Cover(ABC):
     sess: Session
 
     @abstractmethod
-    def get_url(self) -> str:
+    def get_url(self, *args, **kwargs) -> str:
         ...
 
     if AsyncSeekableHTTPFile is not None:
-        async def get_async_file(self, filename: Optional[str] = None) -> AsyncSeekableHTTPFile:
-            return await AsyncSeekableHTTPFile.create(self.get_url(), filename, self.sess.sess)
+        async def get_async_file(self, filename: Optional[str] = None, *args, **kwargs) -> AsyncSeekableHTTPFile:
+            return await AsyncSeekableHTTPFile.create(self.get_url(*args, **kwargs), filename, self.sess.sess)
 
 
 class Track(Object, ABC):
