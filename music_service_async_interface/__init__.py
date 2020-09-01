@@ -14,6 +14,11 @@ except ImportError:
 # TODO [#5]: Specify how to resolve collections of collections of tracks
 #   eg. user containing playlists containing tracks or artist containing albums containing tracks
 
+# TODO: AudioQuality abstract class extending enum with comparability by definition order
+#   https://docs.python.org/3/library/enum.html#using-a-custom-new
+#   https://docs.python.org/3/library/enum.html#orderedenum
+#   hold definition order as additional prop
+
 
 class InvalidURL(Exception):
     pass
