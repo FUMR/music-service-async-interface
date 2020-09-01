@@ -88,7 +88,7 @@ class Cover(ABC):
 
 
 class Track(Object, ABC):
-    # TODO [$5f4db0abd3410800074973ce]: Consider adding audio_quality property to Track
+    # TODO [#7]: Consider adding audio_quality property to Track
 
     @property
     @abstractmethod
