@@ -1,7 +1,7 @@
-__version__ = '0.1.0'
+__version__ = "0.1.0"
 
 from abc import ABC, abstractmethod
-from typing import Optional, Type, AsyncGenerator, Dict
+from typing import AsyncGenerator, Dict, Optional, Type
 
 import aiohttp
 
@@ -26,13 +26,13 @@ class InvalidURL(Exception):
 
 class Session(ABC):
     sess: aiohttp.ClientSession
-    obj: Type['Object']
+    obj: Type["Object"]
 
-    async def object_from_url(self, url: str) -> 'Object':
+    async def object_from_url(self, url: str) -> "Object":
         for child_cls in self.obj.__subclasses__():
             try:
                 return await child_cls.from_url(self, url)
-            except (InvalidURL, NotImplemented):
+            except (InvalidURL, NotImplementedError):
                 pass
 
         # If none objects match url, then the url must be invalid
@@ -46,13 +46,13 @@ class Session(ABC):
         """
         ...
 
-    async def parse_urls(self, long_string: str) -> AsyncGenerator['Object', None]:
+    async def parse_urls(self, long_string: str) -> AsyncGenerator["Object", None]:
         """
         Parses `long_string` including music service URLs to corresponding music service objects
         :param long_string: long string including URLs to music service objects
         :return: generator with music service objects
         """
-        for word in long_string.split(' '):
+        for word in long_string.split(" "):
             if self.is_valid_url(word):
                 try:
                     yield await self.object_from_url(word)
@@ -66,9 +66,9 @@ class Object(ABC):
 
     @classmethod
     @abstractmethod
-    async def from_url(cls, sess: Session, url: str) -> 'Object':
+    async def from_url(cls, sess: Session, url: str) -> "Object":
         # may raise InvalidURL
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     async def get_url(self) -> str:
@@ -83,6 +83,7 @@ class Cover(ABC):
         ...
 
     if AsyncSeekableHTTPFile is not None:
+
         async def get_async_file(self, filename: Optional[str] = None, *args, **kwargs) -> AsyncSeekableHTTPFile:
             return await AsyncSeekableHTTPFile.create(self.get_url(*args, **kwargs), filename, self.sess.sess)
 
@@ -112,11 +113,10 @@ class Track(Object, ABC):
         ...
 
     if AsyncSeekableHTTPFile is not None:
+
         async def get_async_file(self, filename: Optional[str] = None, *args, **kwargs) -> AsyncSeekableHTTPFile:
             return await AsyncSeekableHTTPFile.create(
-                await self.get_file_url(*args, **kwargs),
-                self.title if filename is None else filename,
-                self.sess.sess
+                await self.get_file_url(*args, **kwargs), self.title if filename is None else filename, self.sess.sess
             )
 
 
