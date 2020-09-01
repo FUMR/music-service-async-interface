@@ -111,12 +111,13 @@ class Track(Object, ABC):
     async def get_file_url(self, *args, **kwargs) -> str:
         ...
 
-    async def get_async_file(self, filename: Optional[str] = None, *args, **kwargs) -> AsyncSeekableHTTPFile:
-        return await AsyncSeekableHTTPFile.create(
-            await self.get_file_url(*args, **kwargs),
-            self.title if filename is None else filename,
-            self.sess.sess
-        )
+    if AsyncSeekableHTTPFile is not None:
+        async def get_async_file(self, filename: Optional[str] = None, *args, **kwargs) -> AsyncSeekableHTTPFile:
+            return await AsyncSeekableHTTPFile.create(
+                await self.get_file_url(*args, **kwargs),
+                self.title if filename is None else filename,
+                self.sess.sess
+            )
 
 
 class TrackCollection(Object, ABC):
