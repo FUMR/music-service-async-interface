@@ -27,7 +27,7 @@ class Session(ABC):
         for child_cls in self.obj.__subclasses__():
             try:
                 return await child_cls.from_url(self, url)
-            except InvalidURL:
+            except (InvalidURL, NotImplemented):
                 pass
 
         # If none objects match url, then the url must be invalid
@@ -62,7 +62,8 @@ class Object(ABC):
     @classmethod
     @abstractmethod
     async def from_url(cls, sess: Session, url: str) -> 'Object':
-        raise InvalidURL
+        # may raise InvalidURL
+        raise NotImplemented
 
     @abstractmethod
     async def get_url(self) -> str:
