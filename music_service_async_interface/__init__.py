@@ -83,8 +83,14 @@ class Cover(ABC):
 
 
 class Track(Object, ABC):
+    @property
     @abstractmethod
     def title(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
+    def artist_name(self) -> str:
         ...
 
     @abstractmethod
