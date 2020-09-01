@@ -14,7 +14,7 @@ except ImportError:
 # TODO [#5]: Specify how to resolve collections of collections of tracks
 #   eg. user containing playlists containing tracks or artist containing albums containing tracks
 
-# TODO [$5f4daa0c13741d00080a6c3e]: AudioQuality abstract class extending enum with comparability by definition order
+# TODO [#6]: AudioQuality abstract class extending enum with comparability by definition order
 #   https://docs.python.org/3/library/enum.html#using-a-custom-new
 #   https://docs.python.org/3/library/enum.html#orderedenum
 #   hold definition order as additional prop
