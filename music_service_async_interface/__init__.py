@@ -21,7 +21,7 @@ class InvalidURL(Exception):
 
 
 class AudioQuality(enum.Enum):
-    """Comparable enum for AudioQuality.
+    """Comparable enum for definition of track's audio quality.
 
     Qualities are sorted in order of definition.
     First defined is lower quality than second defined.
