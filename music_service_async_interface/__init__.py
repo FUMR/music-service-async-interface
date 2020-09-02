@@ -52,7 +52,11 @@ class Session(ABC):
         :param long_string: long string including URLs to music service objects
         :return: generator with music service objects
         """
-        for word in long_string.split(" "):
+        # TODO: How should we handle exceptions on loading each URL in Session.parse_urls?
+        #   What if for example one of URLs is invalid?
+        #   ATM it would crash whole function and not parse any other URL
+
+        for word in long_string.split():
             if self.is_valid_url(word):
                 try:
                     yield await self.object_from_url(word)
