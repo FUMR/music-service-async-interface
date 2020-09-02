@@ -58,8 +58,6 @@ class Session(ABC):
                     yield await self.object_from_url(word)
                 except InvalidURL:
                     pass
-                break
-
 
 class Object(ABC):
     sess: Session
