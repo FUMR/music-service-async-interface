@@ -1,5 +1,6 @@
 __version__ = "0.1.0"
 
+import enum
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, Dict, Optional, Type
 
@@ -11,17 +12,61 @@ except ImportError:
     AsyncSeekableHTTPFile = None
 
 
-# TODO [#5]: Specify how to resolve collections of collections of tracks
+# TODO [#5]: Specify how to implement collections of collections of tracks
 #   eg. user containing playlists containing tracks or artist containing albums containing tracks
-
-# TODO [#6]: AudioQuality abstract class extending enum with comparability by definition order
-#   https://docs.python.org/3/library/enum.html#using-a-custom-new
-#   https://docs.python.org/3/library/enum.html#orderedenum
-#   hold definition order as additional prop
 
 
 class InvalidURL(Exception):
     pass
+
+
+class AudioQuality(enum.Enum):
+    """Comparable enum for AudioQuality.
+
+    Qualities are sorted in order of definition.
+    First defined is lower quality than second defined.
+
+    Simple example:
+    >>> class TestAudioQuality(AudioQuality):
+    >>>     LOW = 'low'
+    >>>     MEDIUM = 'med'
+    >>>     HIGH = 'high'
+    >>>
+    >>> TestAudioQuality.LOW > TestAudioQuality.HIGH
+    False
+    >>> TestAudioQuality.LOW >= TestAudioQuality.HIGH
+    False
+    >>> TestAudioQuality.LOW < TestAudioQuality.HIGH
+    True
+    >>> TestAudioQuality.LOW <= TestAudioQuality.HIGH
+    True
+    >>> TestAudioQuality.MEDIUM > TestAudioQuality.LOW
+    True
+    >>> TestAudioQuality.MEDIUM > TestAudioQuality.HIGH
+    False
+    >>> TestAudioQuality.MEDIUM < TestAudioQuality.HIGH
+    False
+    """
+
+    def __ge__(self, other):
+        if self.__class__ is other.__class__:
+            return self._member_names_.index(self.name) >= self._member_names_.index(other.name)
+        return NotImplemented
+
+    def __gt__(self, other):
+        if self.__class__ is other.__class__:
+            return self._member_names_.index(self.name) > self._member_names_.index(other.name)
+        return NotImplemented
+
+    def __le__(self, other):
+        if self.__class__ is other.__class__:
+            return self._member_names_.index(self.name) <= self._member_names_.index(other.name)
+        return NotImplemented
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self._member_names_.index(self.name) < self._member_names_.index(other.name)
+        return NotImplemented
 
 
 class Session(ABC):
@@ -41,14 +86,12 @@ class Session(ABC):
     @staticmethod
     @abstractmethod
     def is_valid_url(url) -> bool:
-        """
-        Performs basic check if string looks like music service URL
-        """
+        """Performs basic check if string looks like music service URL"""
         ...
 
     async def parse_urls(self, long_string: str) -> AsyncGenerator["Object", None]:
-        """
-        Parses `long_string` including music service URLs to corresponding music service objects
+        """Parses `long_string` including music service URLs to corresponding music service objects
+
         :param long_string: long string including URLs to music service objects
         :return: generator with music service objects
         """
@@ -66,7 +109,9 @@ class Object(ABC):
     @classmethod
     @abstractmethod
     async def from_url(cls, sess: Session, url: str) -> "Object":
-        # may raise InvalidURL
+        """
+        :raises: `InvalidURL` -- when URL is being unparsable by this `Object`
+        """
         raise NotImplementedError
 
     @abstractmethod
