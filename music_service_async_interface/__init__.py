@@ -85,7 +85,11 @@ class Cover(ABC):
     if AsyncSeekableHTTPFile is not None:
 
         async def get_async_file(self, filename: Optional[str] = None, *args, **kwargs) -> AsyncSeekableHTTPFile:
-            return await AsyncSeekableHTTPFile.create(self.get_url(*args, **kwargs), filename, self.sess.sess)
+            return await AsyncSeekableHTTPFile.create(
+                self.get_url(*args, **kwargs),
+                filename,
+                self.sess.sess,
+            )
 
 
 class Track(Object, ABC):
@@ -116,7 +120,9 @@ class Track(Object, ABC):
 
         async def get_async_file(self, filename: Optional[str] = None, *args, **kwargs) -> AsyncSeekableHTTPFile:
             return await AsyncSeekableHTTPFile.create(
-                await self.get_file_url(*args, **kwargs), self.title if filename is None else filename, self.sess.sess
+                await self.get_file_url(*args, **kwargs),
+                self.title if filename is None else filename,
+                self.sess.sess,
             )
 
 
