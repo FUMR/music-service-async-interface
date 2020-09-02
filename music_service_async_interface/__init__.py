@@ -59,6 +59,7 @@ class Session(ABC):
                 except InvalidURL:
                     pass
 
+
 class Object(ABC):
     sess: Session
 
