@@ -72,6 +72,15 @@ class AudioQuality(enum.Enum):
 class Session(ABC):
     sess: aiohttp.ClientSession
     obj: Type["Object"]
+    quality: Type[AudioQuality]
+
+    @abstractmethod
+    def __init__(
+        self, obj_cls: Type["Object"], quality_cls: Type[AudioQuality], sess: Optional[aiohttp.ClientSession] = None
+    ):
+        self.quality = quality_cls
+        self.obj = obj_cls
+        self.sess = aiohttp.ClientSession() if sess is None else sess
 
     async def object_from_url(self, url: str) -> "Object":
         for child_cls in self.obj.__subclasses__():
@@ -118,8 +127,17 @@ class Object(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
+    @abstractmethod
+    async def from_id(cls, sess: Session, id_) -> "Object":
+        ...
+
     @abstractmethod
     async def get_url(self) -> str:
+        ...
+
+    @abstractmethod
+    def get_id(self):
         ...
 
 
