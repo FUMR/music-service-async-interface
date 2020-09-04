@@ -78,8 +78,8 @@ class Session(ABC):
     def __init__(
         self, obj_cls: Type["Object"], quality_cls: Type[AudioQuality], sess: Optional[aiohttp.ClientSession] = None
     ):
-        self.quality = quality_cls
-        self.obj = obj_cls
+        self.__class__.quality = quality_cls
+        self.__class__.obj = obj_cls
         self.sess = aiohttp.ClientSession() if sess is None else sess
 
     async def object_from_url(self, url: str) -> "Object":
