@@ -104,7 +104,7 @@ class Session(ABC):
         :param long_string: long string including URLs to music service objects
         :return: generator with music service objects
         """
-        # TODO: How should we handle exceptions on loading each URL in Session.parse_urls?
+        # TODO [$5f51b38e66056e000776a944]: How should we handle exceptions on loading each URL in Session.parse_urls?
         #   What if for example one of URLs is invalid?
         #   ATM it would crash whole function and not parse any other URL
 
