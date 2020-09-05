@@ -76,10 +76,10 @@ class Session(ABC):
 
     @abstractmethod
     def __init__(self, sess: Optional[aiohttp.ClientSession] = None):
-        if not hasattr(self.__class__, "obj"):
-            raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract properties obj")
-        if not hasattr(self.__class__, "quality"):
-            raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract properties quality")
+        if not hasattr(self.__class__, "_obj"):
+            raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract property obj")
+        if not hasattr(self.__class__, "_quality"):
+            raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract property quality")
 
         self.sess = aiohttp.ClientSession() if sess is None else sess
         self._min_accepted_quality: AudioQuality = min(self._quality)
