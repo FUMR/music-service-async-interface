@@ -86,28 +86,28 @@ class Session(ABC):
             raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract property quality")
 
         self.sess = aiohttp.ClientSession() if sess is None else sess
-        self._min_accepted_quality: AudioQuality = min(self._quality)
-        self._preferred_quality: AudioQuality = max(self._quality)
+        self._required_audio_quality: AudioQuality = min(self._quality)
+        self._preferred_audio_quality: AudioQuality = max(self._quality)
 
     @property
     def preferred_audio_quality(self) -> AudioQuality:
-        return self._preferred_quality
+        return self._preferred_audio_quality
 
     @preferred_audio_quality.setter
     def preferred_audio_quality(self, quality: AudioQuality):
         if not isinstance(quality, self._quality):
             raise TypeError(f"quality must be instance of {self._quality}")
-        self._preferred_quality = quality
+        self._preferred_audio_quality = quality
 
     @property
-    def min_accepted_quality(self) -> AudioQuality:
-        return self._min_accepted_quality
+    def required_audio_quality(self) -> AudioQuality:
+        return self._required_audio_quality
 
-    @min_accepted_quality.setter
-    def min_accepted_quality(self, quality: AudioQuality):
+    @required_audio_quality.setter
+    def required_audio_quality(self, quality: AudioQuality):
         if not isinstance(quality, self._quality):
             raise TypeError(f"quality must be instance of {self._quality}")
-        self._min_accepted_quality = quality
+        self._required_audio_quality = quality
 
     async def object_from_url(self, url: str) -> "Object":
         for child_cls in self._obj.__subclasses__():
@@ -208,15 +208,15 @@ class Track(Object, ABC):
     @abstractmethod
     async def get_file_url(
         self,
-        min_accepted_quality: Optional[AudioQuality] = None,
-        preferred_audio_quality: Optional[AudioQuality] = None,
+        required_quality: Optional[AudioQuality] = None,
+        preferred_quality: Optional[AudioQuality] = None,
         *args,
         **kwargs,
     ) -> str:
         """This method asks service for music file url
 
-        :param min_accepted_quality: Quality requirement for track
-        :param preferred_audio_quality: Preferred audio quality, which we are asking for
+        :param required_quality: Quality requirement for track
+        :param preferred_quality: Preferred audio quality, which we are asking for
         :raise: :class:`InsufficientAudioQuality` when quality requirements are not met
         :return: Music file URL
         """
@@ -226,23 +226,23 @@ class Track(Object, ABC):
 
         async def get_async_file(
             self,
-            min_accepted_quality: Optional[AudioQuality] = None,
-            preferred_audio_quality: Optional[AudioQuality] = None,
+            required_quality: Optional[AudioQuality] = None,
+            preferred_quality: Optional[AudioQuality] = None,
             filename: Optional[str] = None,
             *args,
             **kwargs,
         ) -> AsyncSeekableHTTPFile:
             """Gets async `filelike` object for Track
 
-            :param min_accepted_quality: Quality requirement for track
-            :param preferred_audio_quality: Preferred audio quality, which we are asking for
+            :param required_quality: Quality requirement for track
+            :param preferred_quality: Preferred audio quality, which we are asking for
             :param filename: File name for `filelike`
             :raise: :class:`InsufficientAudioQuality` when quality requirements are not met
             :return: Music file
             """
 
             return await AsyncSeekableHTTPFile.create(
-                await self.get_file_url(min_accepted_quality, preferred_audio_quality, *args, **kwargs),
+                await self.get_file_url(required_quality, preferred_quality, *args, **kwargs),
                 self.title if filename is None else filename,
                 self.sess.sess,
             )
