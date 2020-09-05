@@ -71,8 +71,8 @@ class AudioQuality(enum.Enum):
 
 class Session(ABC):
     sess: aiohttp.ClientSession
-    obj: Type["Object"]
-    quality: Type[AudioQuality]
+    _obj: Type["Object"]
+    _quality: Type[AudioQuality]
 
     @abstractmethod
     def __init__(self, sess: Optional[aiohttp.ClientSession] = None):
@@ -82,9 +82,31 @@ class Session(ABC):
             raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract properties quality")
 
         self.sess = aiohttp.ClientSession() if sess is None else sess
+        self._min_accepted_quality: AudioQuality = min(self._quality)
+        self._preferred_quality: AudioQuality = max(self._quality)
+
+    @property
+    def preferred_audio_quality(self) -> AudioQuality:
+        return self._preferred_quality
+
+    @preferred_audio_quality.setter
+    def preferred_audio_quality(self, quality: AudioQuality):
+        if not isinstance(quality, self._quality):
+            raise TypeError(f"quality must be instance of {self._quality}")
+        self._preferred_quality = quality
+
+    @property
+    def min_accepted_quality(self) -> AudioQuality:
+        return self._min_accepted_quality
+
+    @min_accepted_quality.setter
+    def min_accepted_quality(self, quality: AudioQuality):
+        if not isinstance(quality, self._quality):
+            raise TypeError(f"quality must be instance of {self._quality}")
+        self._min_accepted_quality = quality
 
     async def object_from_url(self, url: str) -> "Object":
-        for child_cls in self.obj.__subclasses__():
+        for child_cls in self._obj.__subclasses__():
             try:
                 return await child_cls.from_url(self, url)
             except (InvalidURL, NotImplementedError):
