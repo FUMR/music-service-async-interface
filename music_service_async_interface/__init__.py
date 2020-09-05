@@ -213,6 +213,13 @@ class Track(Object, ABC):
         *args,
         **kwargs,
     ) -> str:
+        """This method asks service for music file url
+
+        :param min_accepted_quality: Quality requirement for track
+        :param preferred_audio_quality: Preferred audio quality, which we are asking for
+        :raise: :class:`InsufficientAudioQuality` when quality requirements are not met
+        :return: Music file URL
+        """
         ...
 
     if AsyncSeekableHTTPFile is not None:
@@ -225,6 +232,15 @@ class Track(Object, ABC):
             *args,
             **kwargs,
         ) -> AsyncSeekableHTTPFile:
+            """Gets async `filelike` object for Track
+
+            :param min_accepted_quality: Quality requirement for track
+            :param preferred_audio_quality: Preferred audio quality, which we are asking for
+            :param filename: File name for `filelike`
+            :raise: :class:`InsufficientAudioQuality` when quality requirements are not met
+            :return: Music file
+            """
+
             return await AsyncSeekableHTTPFile.create(
                 await self.get_file_url(min_accepted_quality, preferred_audio_quality, *args, **kwargs),
                 self.title if filename is None else filename,
