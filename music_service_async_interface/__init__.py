@@ -20,6 +20,10 @@ class InvalidURL(Exception):
     pass
 
 
+class InsufficientAudioQuality(Exception):
+    pass
+
+
 class AudioQuality(enum.Enum):
     """Comparable enum for definition of track's audio quality.
 
@@ -202,14 +206,27 @@ class Track(Object, ABC):
         ...
 
     @abstractmethod
-    async def get_file_url(self, *args, **kwargs) -> str:
+    async def get_file_url(
+        self,
+        min_accepted_quality: Optional[AudioQuality] = None,
+        preferred_audio_quality: Optional[AudioQuality] = None,
+        *args,
+        **kwargs,
+    ) -> str:
         ...
 
     if AsyncSeekableHTTPFile is not None:
 
-        async def get_async_file(self, filename: Optional[str] = None, *args, **kwargs) -> AsyncSeekableHTTPFile:
+        async def get_async_file(
+            self,
+            min_accepted_quality: Optional[AudioQuality] = None,
+            preferred_audio_quality: Optional[AudioQuality] = None,
+            filename: Optional[str] = None,
+            *args,
+            **kwargs,
+        ) -> AsyncSeekableHTTPFile:
             return await AsyncSeekableHTTPFile.create(
-                await self.get_file_url(*args, **kwargs),
+                await self.get_file_url(min_accepted_quality, preferred_audio_quality, *args, **kwargs),
                 self.title if filename is None else filename,
                 self.sess.sess,
             )
