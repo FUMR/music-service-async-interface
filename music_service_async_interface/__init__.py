@@ -2,6 +2,7 @@ __version__ = "0.1.0"
 
 import enum
 from abc import ABC, abstractmethod
+from functools import lru_cache
 from typing import AsyncGenerator, Dict, Optional, Type
 
 import aiohttp
@@ -252,3 +253,29 @@ class TrackCollection(Object, ABC):
     @abstractmethod
     async def tracks(self) -> AsyncGenerator[Track, None]:
         ...
+
+
+class TrackCollectionSet:
+    def __new__(cls):
+        raise TypeError(f"You can't directly spawn this class. Use {cls.__name__}[YourTrackCollection]")
+
+    def __init_subclass__(cls):
+        raise TypeError("You can't directly subclass this class. Use TrackCollectionSet[YourTrackCollection]")
+
+    @classmethod
+    @lru_cache
+    def __class_getitem__(cls, collection_type: Type[TrackCollection]):
+        if not issubclass(collection_type, TrackCollection):
+            raise TypeError(f"collection_type need to be subclass of TrackCollection, got {collection_type} instead")
+
+        async def _load_collections(self) -> AsyncGenerator[TrackCollection, None]:
+            ...
+
+        func_name = collection_type.__name__.lower() + "s"
+        _load_collections.__name__ = func_name
+
+        return type(
+            f"TrackCollectionSet[{collection_type.__name__}]",
+            (Object, ABC),
+            {"__module__": cls.__module__, func_name: abstractmethod(_load_collections)},
+        )
