@@ -257,16 +257,16 @@ class TrackCollection(Object, ABC):
 
 class TrackCollectionSet:
     def __new__(cls):
-        raise TypeError(f"You can't directly spawn this class. Use {cls.__name__}[YourTrackCollection]")
+        raise TypeError(f"Can't instantiate this class directly. Try {cls.__name__}[TrackCollection]")
 
     def __init_subclass__(cls):
-        raise TypeError("You can't directly subclass this class. Use TrackCollectionSet[YourTrackCollection]")
+        raise TypeError("Can't subclass this class directly. Try TrackCollectionSet[TrackCollection]")
 
     @classmethod
     @lru_cache
     def __class_getitem__(cls, collection_type: Type[TrackCollection]):
         if not issubclass(collection_type, TrackCollection):
-            raise TypeError(f"collection_type need to be subclass of TrackCollection, got {collection_type} instead")
+            raise TypeError(f"index must be subclass of TrackCollection, not {collection_type}")
 
         async def _load_collections(self) -> AsyncGenerator[TrackCollection, None]:
             ...
