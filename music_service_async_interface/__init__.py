@@ -14,7 +14,7 @@ except ImportError:
 
 
 def plural_noun(val):
-    # TODO [$5f56a855f6bd64000751938b]: Plural noun rules
+    # TODO [#26]: Plural noun rules
     #   https://www.grammarly.com/blog/plural-nouns/
     return val + "s"
 
