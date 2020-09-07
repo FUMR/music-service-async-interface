@@ -19,10 +19,6 @@ def plural_noun(val):
     return val + "s"
 
 
-# TODO [#5]: Specify how to implement collections of collections of tracks
-#   eg. user containing playlists containing tracks or artist containing albums containing tracks
-
-
 class InvalidURL(Exception):
     pass
 
@@ -88,9 +84,9 @@ class Session(ABC):
     @abstractmethod
     def __init__(self, sess: Optional[aiohttp.ClientSession] = None):
         if not hasattr(self.__class__, "_obj"):
-            raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract property obj")
+            raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract property _obj")
         if not hasattr(self.__class__, "_quality"):
-            raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract property quality")
+            raise TypeError(f"Can't instantiate abstract class {self.__class__} with abstract property _quality")
 
         self.sess = aiohttp.ClientSession() if sess is None else sess
         self._required_audio_quality: AudioQuality = min(self._quality)
@@ -217,7 +213,6 @@ class Track(Object, ABC):
         self,
         required_quality: Optional[AudioQuality] = None,
         preferred_quality: Optional[AudioQuality] = None,
-        *args,
         **kwargs,
     ) -> str:
         """This method asks service for music file url
@@ -236,7 +231,6 @@ class Track(Object, ABC):
             required_quality: Optional[AudioQuality] = None,
             preferred_quality: Optional[AudioQuality] = None,
             filename: Optional[str] = None,
-            *args,
             **kwargs,
         ) -> AsyncSeekableHTTPFile:
             """Gets async `filelike` object for Track
@@ -249,7 +243,7 @@ class Track(Object, ABC):
             """
 
             return await AsyncSeekableHTTPFile.create(
-                await self.get_file_url(required_quality, preferred_quality, *args, **kwargs),
+                await self.get_file_url(required_quality, preferred_quality, **kwargs),
                 self.title if filename is None else filename,
                 self.sess.sess,
             )
@@ -268,7 +262,7 @@ class ObjectCollection:
         if not issubclass(collection_type, Object):
             raise TypeError(f"index must be subclass of Object, not {collection_type}")
 
-        class CollectionHelper(ABC):
+        class CollectionHelper:
             collection_of: Set[Type[Object]] = set()
 
             def __init_subclass__(cls, **kwargs):
