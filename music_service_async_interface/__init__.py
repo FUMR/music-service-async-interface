@@ -3,7 +3,7 @@ __version__ = "0.1.0"
 import enum
 from abc import ABC, abstractmethod
 from functools import lru_cache
-from typing import AsyncGenerator, Dict, Optional, Type
+from typing import AsyncGenerator, Dict, Optional, Set, Type
 
 import aiohttp
 
@@ -11,6 +11,12 @@ try:
     from httpseekablefile import AsyncSeekableHTTPFile
 except ImportError:
     AsyncSeekableHTTPFile = None
+
+
+def plural_noun(val):
+    # TODO: Plural noun rules
+    #   https://www.grammarly.com/blog/plural-nouns/
+    return val + "s"
 
 
 # TODO [#5]: Specify how to implement collections of collections of tracks
@@ -249,33 +255,43 @@ class Track(Object, ABC):
             )
 
 
-class TrackCollection(Object, ABC):
-    @abstractmethod
-    async def tracks(self) -> AsyncGenerator[Track, None]:
-        ...
-
-
-class TrackCollectionSet:
+class ObjectCollection:
     def __new__(cls):
-        raise TypeError(f"Can't instantiate this class directly. Try {cls.__name__}[TrackCollection]")
+        raise TypeError(f"Can't instantiate this class directly. Try {cls.__name__}[Object]")
 
     def __init_subclass__(cls):
-        raise TypeError("Can't subclass this class directly. Try TrackCollectionSet[TrackCollection]")
+        raise TypeError("Can't subclass this class directly. Try ObjectCollection[Object]")
 
     @classmethod
     @lru_cache
-    def __class_getitem__(cls, collection_type: Type[TrackCollection]):
-        if not issubclass(collection_type, TrackCollection):
-            raise TypeError(f"index must be subclass of TrackCollection, not {collection_type}")
+    def __class_getitem__(cls, collection_type: Type[Object]):
+        if not issubclass(collection_type, Object):
+            raise TypeError(f"index must be subclass of Object, not {collection_type}")
 
-        async def _load_collections(self) -> AsyncGenerator[TrackCollection, None]:
+        class CollectionHelper(ABC):
+            collection_of: Set[Type[Object]] = set()
+
+            def __init_subclass__(cls, **kwargs):
+                super().__init_subclass__(**kwargs)
+                if cls.collection_of:
+                    cls.collection_of.add(collection_type)
+                else:
+                    cls.collection_of = {collection_type}
+
+            def iter(self, collection_type_: Type[Object]) -> AsyncGenerator[Object, None]:
+                if collection_type_ in self.collection_of:
+                    func_name_ = plural_noun(collection_type_.__name__.lower())
+                    return getattr(self, func_name_)()
+                raise KeyError(collection_type_)
+
+        async def _load_collections(self) -> AsyncGenerator[Object, None]:
             ...
 
-        func_name = collection_type.__name__.lower() + "s"
+        func_name = plural_noun(collection_type.__name__.lower())
         _load_collections.__name__ = func_name
 
         return type(
-            f"TrackCollectionSet[{collection_type.__name__}]",
-            (Object, ABC),
+            f"ObjectCollection[{collection_type.__name__}]",
+            (Object, CollectionHelper, ABC),
             {"__module__": cls.__module__, func_name: abstractmethod(_load_collections)},
         )
