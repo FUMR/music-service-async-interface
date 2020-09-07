@@ -272,13 +272,13 @@ class ObjectCollection:
                 else:
                     cls.collection_of = {collection_type}
 
-            def iter(self, collection_type_: Type[Object]) -> AsyncGenerator[Object, None]:
+            def iter(self, collection_type_: Type[Object], *args, **kwargs) -> AsyncGenerator[Object, None]:
                 if collection_type_ in self.collection_of:
                     func_name_ = plural_noun(collection_type_.__name__.lower())
-                    return getattr(self, func_name_)()
+                    return getattr(self, func_name_)(*args, **kwargs)
                 raise KeyError(collection_type_)
 
-        async def _load_collections(self) -> AsyncGenerator[Object, None]:
+        async def _load_collections(self, *args, **kwargs) -> AsyncGenerator[Object, None]:
             ...
 
         func_name = plural_noun(collection_type.__name__.lower())
