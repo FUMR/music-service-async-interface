@@ -3,7 +3,7 @@ __version__ = "0.1.0"
 import enum
 from abc import ABC, abstractmethod
 from functools import lru_cache
-from typing import AsyncGenerator, Dict, Optional, Set, Type
+from typing import AsyncGenerator, Dict, List, Optional, Set, Type, Union
 
 import aiohttp
 
@@ -24,6 +24,10 @@ class InvalidURL(Exception):
 
 
 class InsufficientAudioQuality(Exception):
+    pass
+
+
+class InvalidSearchType(Exception):
     pass
 
 
@@ -197,6 +201,24 @@ class Session(ABC):
                 except InvalidURL:
                     pass
 
+    @abstractmethod
+    async def search(
+        self, query: str, types: Optional[Union[Type["Searchable"], List[Type["Searchable"]]]] = None, limit: int = 10
+    ) -> AsyncGenerator["Searchable", None]:
+        """Searches music service for specific :class:`Searchable` types using `query`
+        Accepts single :class:`Searchable` type, list of them or allows to entirely skip `types` parameter.
+
+        :param query: search string/phrase
+        :param types: :class:`Searchable` type or list of types, restricts search results to this type,
+        e.g. if you want to search for tracks use `sess.search('text', Track)`
+        or if you want to search for albums and playlists use `sess.search('text', [Album, Playlist])`.
+        Also allows to search for all possible objects, then this parameter is left unset, set to None or an empty list.
+        :param limit: amount of records to search for
+        :raise InvalidSearchType: when `types` contains invalid type (not a subclass of :class:`Searchable`)
+        :yield: :class:`Searchable` objects for each search result
+        """
+        ...
+
 
 class Object(ABC):
     """Abstract class representing music service object e.g. Track, Artist or Playlist
@@ -252,6 +274,13 @@ class Object(ABC):
         :return: :class:`Cover` image or `None` if :class:`Object` has no cover
         """
         ...
+
+
+class Searchable(Object, ABC):
+    """Generic class to be extended by any searchable :class:`Object`
+    For example if music service is able to search for tracks and
+    playlists, `Track` and `Playlist` classes should extend this class.
+    """
 
 
 class Cover(ABC):
@@ -492,8 +521,7 @@ class ObjectCollection:
         async def _load_collections(self, *args, **kwargs) -> AsyncGenerator[Object, None]:
             ...
 
-        func_name = plural_noun(collection_type.__name__.lower())
-        _load_collections.__name__ = func_name
+        _load_collections.__name__ = func_name = plural_noun(collection_type.__name__.lower())
 
         return type(
             f"ObjectCollection[{collection_type.__name__}]",
