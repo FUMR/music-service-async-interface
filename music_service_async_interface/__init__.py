@@ -497,7 +497,7 @@ class ObjectCollection:
         raise TypeError("Can't subclass this class directly. Try ObjectCollection[Object]")
 
     @classmethod
-    @lru_cache
+    @lru_cache()
     def __class_getitem__(cls, collection_type: Type[Object]):
         if not issubclass(collection_type, Object):
             raise TypeError(f"index must be subclass of Object, not {collection_type}")
