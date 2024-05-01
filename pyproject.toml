@@ -10,7 +10,7 @@ http-seekable-file = { git = "https://github.com/JuniorJPDJ/http-seekable-file.g
 aiohttp = "^3.6"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^2.12"
+pre-commit = "^3.0.0"
 
 [tool.poetry.extras]
 filelike = ["http-seekable-file"]
